@@ -19,7 +19,7 @@ To build just type ```make``` given that you have the following tools in your pa
 - debugging using code upload via microcontroller to joystick port\
 
 YouTube recording:\
-[![Mandelbrot by PriorArt](https://youtu.be/wd7M3JLtAvQ)]\
+[![Mandelbrot by PriorArt](http://img.youtube.com/vi/wd7M3JLtAvQ/0.jpg](https://www.youtube.com/watch?v=wd7M3JLtAvQ)
 
 ## Credits\
 - code: *Martin 'enthusi' Wendt\
