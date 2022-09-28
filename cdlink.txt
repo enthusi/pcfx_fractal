@@ -1,0 +1,7 @@
+binary mandelbrot
+name mandelbrot
+maker enthusi
+makerid PriorArt
+date 20220928
+country 1
+version 1
