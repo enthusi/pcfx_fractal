@@ -9,7 +9,7 @@ use ```Controller``` pad for moving around\
 
 To build just type ```make``` given that you have the following tools in your path:\
 [v810 binutils](https://github.com/jbrandwood/v810-gcc)\
-[pcfx-tools](https://github.com/jbrandwood/pcfxtools)\
+[pcfx-tools](https://github.com/jbrandwood/pcfxtools)
 
 ## Technical details
 - the palette based color cycle runs in 7upA vblank
@@ -22,4 +22,4 @@ YouTube recording:\
 [![Mandelbrot by PriorArt](http://img.youtube.com/vi/wd7M3JLtAvQ/0.jpg)](http://www.youtube.com/watch?v=wd7M3JLtAvQ "Mandelbrot by PriorArt")
 
 ## Credits
-- code: *Martin 'enthusi' Wendt
+- code: *Martin 'enthusi' Wendt*
