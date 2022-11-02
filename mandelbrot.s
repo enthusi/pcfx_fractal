@@ -1,206 +1,5 @@
-/* ============================================ */
-/* MACROS */
-
-.macro  push reg1
-        add     -4, sp
-        st.w    \reg1, 0x0[sp]
-.endm
-
-.macro  pop reg1
-        ld.w    0x0[sp], \reg1
-        add     4, sp
-.endm
-#https://astro.uni-bonn.de/~sysstw/CompMan/gnu/as.html#SEC60
-
-#20912
-.macro  movw data, reg1
-        movhi   hi(\data),r0,\reg1
-        movea   lo(\data),\reg1,\reg1
-.endm
-
-.macro  movwl data, reg1
-        movea   lo(\data),r0,\reg1
-        movhi   hi(\data),\reg1,\reg1
-.endm
-
-.macro  call target
-        push lp
-        jal \target
-        pop lp
-.endm
-
-.macro  ret
-        jmp [lp]
-.endm
-
-.macro  jump target
-        movw    \target, r30
-        jmp     [r30]
-.endm
-/*============================================================= */
-/* IO ADRESSES */
-
-.equiv HuC6261_reg, 0x300
-.equiv HuC6261_dat, 0x304
-
-.equiv SUPA_reg, 0x400
-.equiv SUPA_dat, 0x404
-
-.equiv SUPB_reg, 0x500
-.equiv SUPB_dat, 0x504
-
-.equiv KING_reg, 0x600
-.equiv KING_dat, 0x604
-.equiv KING_dat2, 0x606
-
-/* register OFFSETS */
-
-.equiv HuC6261_SCREENMODE, 0x00
-.equiv HuC6261_PAL_NR, 0x01
-.equiv HuC6261_PAL_DATA, 0x02
-.equiv HuC6261_PAL_READ, 0x03 
-.equiv HuC6261_PAL_7UP_OFF, 0x4
-.equiv HuC6261_PAL_KING_01, 0x5 
-.equiv HuC6261_PAL_KING_23, 0x6 
-.equiv HuC6261_PAL_RAINBOW, 0x7 
-.equiv HuC6261_PRIO_0, 0x8
-.equiv HuC6261_PRIO_1, 0x9 
-.equiv HuC6261_COLKEY_Y, 0xa
-.equiv HuC6261_COLKEY_U, 0xb
-.equiv HuC6261_COLKEY_V, 0xc
-.equiv HuC6261_COLCELL, 0xd
-.equiv HuC6261_CTRL_CELL, 0xe
-.equiv HuC6261_CELL_SPRBANK, 0x0f 
-.equiv HuC6261_CELL_1A, 0x10 
-.equiv HuC6261_CELL_1B, 0x11
-.equiv HuC6261_CELL_2A, 0x12
-.equiv HuC6261_CELL_2B, 0x13
-.equiv HuC6261_CELL_3A, 0x14
-.equiv HuC6261_CELL_3B, 0x15
-
-.equiv KING_KRAM_ADR_read, 0x0c
-.equiv KING_KRAM_ADR_write, 0x0d
-.equiv KING_KRAM_rw, 0x0e
-.equiv KING_KRAM_page, 0x0f
-
-.equiv KING_BG_MODE, 0x10
-.equiv KING_BG_PRIO, 0x12
-.equiv KING_MICRO_ADR, 0x13
-.equiv KING_MICRO_DATA, 0x14
-.equiv KING_MICRO_CTRL, 0x15
-
-.equiv KING_BG_SCROLL, 0x16
-
-.equiv KING_BG0_BAT,    0x20
-.equiv KING_BG0_CG,     0x21
-.equiv KING_BG0_BATsub, 0x22
-.equiv KING_BG0_CGsub,  0x23
-
-.equiv KING_BG1_BAT,    0x24
-.equiv KING_BG1_CG,     0x25
-
-.equiv KING_BG2_BAT,    0x26
-.equiv KING_BG2_CG,     0x27
-
-.equiv KING_BG3_BAT,    0x28
-.equiv KING_BG3_CG,     0x29
-
-.equiv KING_BG0_size,   0x2c
-.equiv KING_BG1_size,   0x2d
-.equiv KING_BG2_size,   0x2e
-.equiv KING_BG3_size,   0x2f
-
-.equiv KING_BG0_X,   0x30
-.equiv KING_BG0_Y,   0x31
-
-.equiv KING_BG1_X,   0x32
-.equiv KING_BG1_Y,   0x33
-
-.equiv KING_BG2_X,   0x34
-.equiv KING_BG2_Y,   0x35
-
-.equiv KING_BG3_X,   0x36
-.equiv KING_BG3_Y,   0x37
-
-.equiv KING_BG_aff_A, 0x38
-.equiv KING_BG_aff_B, 0x39
-.equiv KING_BG_aff_C, 0x3a
-.equiv KING_BG_aff_D, 0x3b
-.equiv KING_BG_aff_centerX, 0x3c
-.equiv KING_BG_aff_centerY, 0x3d
-
-.equiv SUP_VRAM_ADR_W, 0x00
-.equiv SUP_VRAM_ADR_R, 0x01
-.equiv SUP_VRAM_RW, 0x02
-.equiv SUP_CTRL, 0x05
-.equiv SUP_RASTER, 0x06
-.equiv SUP_BG_X, 0x7
-.equiv SUP_BG_Y, 0x8
-.equiv SUP_MEMWIDTH, 0x09
-.equiv SUP_HSYNC, 0x0a
-.equiv SUP_HDISP, 0x0b
-.equiv SUP_VSYNC, 0x0c
-.equiv SUP_VDISP, 0x0d
-.equiv SUP_VDISPEND, 0x0e
-.equiv SUP_DMA_CTRL, 0x0f
-.equiv SUP_DMA_SRC, 0x10
-.equiv SUP_DMA_DST, 0x11
-.equiv SUP_DMA_LEN, 0x12
-.equiv SUP_SAT_ADR, 0x13
-
-/* BIT FLAGS */
-
-.equiv HuC6261_line262, (0x01 << 0)
-.equiv HuC6261_intsync, ( 0x0 << 2) /* int or ext? */
-.equiv HuC6261_320px,   ( 0x1 << 3)
-.equiv HuC6261_256px,   ( 0x0 << 3)
-.equiv HuC6261_bg16,    ( 0x0 << 6)
-.equiv HuC6261_bg256,   ( 0x1 << 6)
-.equiv HuC6261_spr16,   ( 0x0 << 7)
-.equiv HuC6261_spr256,  ( 0x1 << 7)
-
-.equiv HuC6261_7upBG_on,  ( 0x1 << 8)
-.equiv HuC6261_7upSPR_on, ( 0x1 << 9)
-.equiv HuC6261_KingBG0_on,( 0x1 << 10)
-.equiv HuC6261_KingBG1_on,( 0x1 << 11)
-.equiv HuC6261_KingBG2_on,( 0x1 << 12)
-.equiv HuC6261_KingBG3_on,( 0x1 << 13)
-.equiv HuC6261_Rainbow_on,( 0x1 << 14)
-
-.equiv KING_mode_4,     0b0001
-.equiv KING_mode_16,    0b0010
-.equiv KING_mode_256,   0b0011
-.equiv KING_mode_64k,   0b0100
-.equiv KING_mode_16m,   0b0101
-.equiv KING_mode_4block,  0b1001
-.equiv KING_mode_16block, 0b1010
-.equiv KING_mode_256block,0b1011
-
-.equiv KING_prio_hidden,     0b000
-.equiv KING_prio_last,       0b001
-.equiv KING_prio_abovelast,  0b010
-.equiv KING_prio_underfirst, 0b011
-.equiv KING_prio_first,      0b100
-
-.equiv KING_size_8,     0b0011
-.equiv KING_size_16,    0b0100
-.equiv KING_size_32,    0b0101
-.equiv KING_size_64,    0b0110
-.equiv KING_size_128,   0b0111
-.equiv KING_size_256,   0b1000
-.equiv KING_size_512,   0b1001
-.equiv KING_size_1024,  0b1010 /*only bg0*/
-
-.equiv KING_b_height,    0
-.equiv KING_b_width,     4
-.equiv KING_b_subheight, 8
-.equiv KING_b_subwidth, 12
-.equiv KING_b_inc, 18 /*for read/write*/
-
-.equiv KING_bg0_rotation,    (1<<12)
-
-.equiv SUP_SPR_on, (1<<6)
-.equiv SUP_BG_on, (1<<7)
+.include "macros.s"
+.include "defines.s"
 
 /*============================================================= */
 /* registers */
@@ -218,9 +17,6 @@
 #constants related to the Mandelbrot drawing routine
 .equiv _fractal_height, 240
 .equiv _fractal_width, 256
-
-/*============================================================= */
-.equiv VEC_IRQ_VBLA,  0x7fcc
 /* ============================================================= */
 .org = 0x8000
 
@@ -230,8 +26,12 @@ _start:
     movw 0x200000, sp
     movw 0x8000, gp #technically this should be higher so it can make use of signed offsets
     
-	mov     2, r22 /*;enable cache as default*/
-    ldsr    r22, 24/*;CHCW*/
+	#hint from Elmer: CD-DMA during boot may have invalidated it!
+    ldsr    r0,chcw
+    movea   0x8001,r0,r1
+    ldsr    r1,chcw
+    mov     2,r1
+    ldsr    r1,chcw
 	
     mov HuC6261_SCREENMODE, r_register	
 	movw ( HuC6261_line262 | HuC6261_intsync | HuC6261_256px | HuC6261_KingBG0_on | HuC6261_KingBG1_on | HuC6261_7upBG_on), r_value
@@ -312,7 +112,7 @@ _start:
 
 /* 	; BG priority*/
 	movw KING_BG_PRIO, r_register
-	movw (KING_prio_underfirst | KING_prio_first<<3 | KING_prio_hidden<<6 | KING_prio_hidden<<8), r_value  /*; (binary 001 010)*/
+	movw (KING_prio_underfirst | KING_prio_first<<3 | KING_prio_hidden<<6 | KING_prio_hidden<<9), r_value  /*; (binary 001 010)*/
 	out.h r_register, KING_reg[r0]
 	out.h r_value, KING_dat[r0]
 
@@ -327,7 +127,7 @@ _start:
 	out.h r_register, KING_reg[r0]
 	out.h r_value, KING_dat[r0]
 	
-	movwl .kingMicroprogram, r_tmp_adr
+	movw .kingMicroprogram, r_tmp_adr
 	movw 16, r_tmp_loop
 
 	movw KING_MICRO_DATA, r_register	/*; Microprogram data*/
@@ -397,8 +197,8 @@ _start:
 	out.h r_value, KING_dat[r0]
 	
 	#depack border gfx into RAM buffer
-    movwl border_img, r10
-    movwl buffer, r11
+    movw border_img, r10
+    movw buffer, r11
     call depack/*;r10=source, r11=destination; 124 Bytes*/
     call upload_bitmap
     
@@ -437,10 +237,11 @@ _start:
 	
 	
 	call put_palette 
+	
 
  #METHOD 1 to set the VECTOR JUMP
     movw	VEC_IRQ_VBLA, r10
-    movwl irq_handler ,r11
+    movw irq_handler ,r11
 	sub	r10, r11
 	st.h	r11, 2[r10]
 	shr	16, r11
@@ -594,7 +395,7 @@ _skip_compute:
 .joy_up:
 	
 /* 	;scroll BUFFER up */
-    movwl (buffer), r10 
+    movw (buffer), r10 
     movw (_fractal_height-16),r8 /*;lines*/
 _loop2c:
     movw (_fractal_width/4),r9 /*;full width */
@@ -641,7 +442,7 @@ _loop1c:
 .joydown:
 	
 /*     ;scroll BUFFER down */
-    movwl (buffer+256*(_fractal_height-16)), r10 
+    movw (buffer+256*(_fractal_height-16)), r10 
     movw (_fractal_height-15),r8 
 _loop2d:
     movw ((_fractal_width)/4),r9 
@@ -682,7 +483,7 @@ _loop1d:
 	bz .checkPadRight
 .joy_left:	
 	add -1, r21
-	movwl (buffer), r10
+	movw (buffer), r10
     movw _fractal_height,r8 
 _loop2:
     movw ((_fractal_width-16+4)/4),r9 /*;full width minus shifts*/
@@ -724,7 +525,7 @@ _loop1:
 	bz .check_next
 .joy_right:
 	add 1, r21
-	movwl (buffer+_fractal_width-4), r10
+	movw (buffer+_fractal_width-4), r10
     movw _fractal_height,r8 
 _loop2b:
     movw ((_fractal_width-16)/4),r9
@@ -856,7 +657,7 @@ plot_mandelbrot:
 	 
 bigloop:
 
-    movwl buffer, r18 
+    movw buffer, r18 
     movw 8*16,r27 
     mov r12,r2
     sub r11,r2
@@ -971,7 +772,7 @@ transfer_result:
 /* http://daifukkat.su/pcfx/data/memmap.html */
 /* you can use bitstring here as well */
     movw 0x10000, r_tmp_loop
-	movwl buffer, r_tmp_adr
+	movw buffer, r_tmp_adr
 
 	mov KING_KRAM_ADR_write, r_register
 	movw (0x00000 | (1 << KING_b_inc)) , r_value
@@ -992,7 +793,7 @@ cycle:
 /*     ;move first color to back and then all one up */
 /* but col 00 = transparent */
 /* col 01 = kept black */
-        movwl test_palette+4, r_tmp_adr
+        movw test_palette+4, r_tmp_adr
         ld.h 0[r_tmp_adr],r_tmp_data
         st.h r_tmp_data,(63*2)[r_tmp_adr]
         movw 63*2, r_tmp_loop
@@ -1015,7 +816,7 @@ full_range:
     out.h r_tmp_data, HuC6261_reg[r0]
 	out.h r0, HuC6261_dat[r0]
 	
-	movwl test_palette, r_tmp_adr
+	movw test_palette, r_tmp_adr
 	mov HuC6261_PAL_DATA, r_tmp_data	
 	out.h r_tmp_data, HuC6261_reg[r0]
 .nextTetsuPaletteEntry:
@@ -1035,7 +836,7 @@ upload_bitmap:
 /* http://daifukkat.su/pcfx/data/memmap.html */
 /* you can use bitstring here as well */
     movw 0x10000, r_tmp_loop
-	movwl buffer, r_tmp_adr
+	movw buffer, r_tmp_adr
 
 	mov KING_KRAM_ADR_write, r_register
 	movw (0x10000 | (1 << KING_b_inc)) , r_value
@@ -1135,6 +936,11 @@ test_palette:
 .align 2
 border_img:
 .incbin "border_bitmap.datprep.dat" #lz4 packed border bitmap in 256col mode (but only using 256-64=192 colors)
+
+
+#end marker which helps debugging
+.hword 0x55aa
+.hword 0x77bb
 
 .align 2
 buffer:      

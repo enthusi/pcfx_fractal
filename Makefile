@@ -8,13 +8,13 @@ mandelbrot: binary.o
 binary.o: $(SOURCE)  pal64.dat border_pal.dat
 	v810-as -al $(SOURCE) -o binary.o > list.s
 	
-cd: mandelbrot.cue
+cd: mandelbrot_priorart.cue
 
-mandelbrot.cue: cdlink.txt mandelbrot
+mandelbrot_priorart.cue: cdlink.txt mandelbrot
 	pcfx-cdlink cdlink.txt mandelbrot_priorart
 	
-run: mandelbrot.cue
-	$(EMU) mandelbrot.cue
+run: mandelbrot_priorart.cue
+	$(EMU) mandelbrot_priorart.cue
 
 dump: binary.o
 	v810-objdump -d binary.o
